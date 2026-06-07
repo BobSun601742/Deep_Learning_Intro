@@ -72,7 +72,9 @@ We get the objective "Loss" we wish to minimize.
 We want to update parameters W and b using gradient descent:
 
 $$
-W_{new} = W - \eta \frac{\partial L}{\partial W}\\[10pt]
+W_{new} = W - \eta \frac{\partial L}{\partial W}
+$$
+$$
 b_{new} = b - \eta \frac{\partial L}{\partial b}
 $$
 
@@ -168,8 +170,14 @@ $$
 Assume:
 
 $$
-A = X W\\[10pt]
-X \in R^{N\times D}, W \in R^{D\times M}\\[10pt]
+A = X W
+$$
+
+$$
+X \in R^{N\times D}, W \in R^{D\times M}
+$$
+
+$$
 A \in R^{N\times M}
 $$
 
@@ -257,8 +265,14 @@ Assume:
 
 $$
 A = XW + b\\[10pt]
-X \in R^{N\times D}, W \in R^{D\times M}\\[10pt]
-b \in R^{1\times M}\\[10pt]
+X \in R^{N\times D}, W \in R^{D\times M}
+$$
+
+$$
+b \in R^{1\times M}
+$$
+
+$$
 A \in R^{N\times M}
 $$
 

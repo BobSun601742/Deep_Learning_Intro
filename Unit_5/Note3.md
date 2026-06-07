@@ -1,295 +1,271 @@
 # June 2nd, Diary 3
 
-## Summary:
+## Summary
 In today's learning, we completed several complicated tasks:
+
 * Understand mechanism of "Back Propagation"
 * Learn how to construct some particular layers' forward and back propagation form
 * Improve the TwoLayerNet we completed in last study
 * Learn methods of checking accuracy of learning
 
-## Back Propagation Comprehension:
+## Back Propagation Comprehension
+
 ### Review of Forward Propagation
+
 Let us make an assumption. We now have:
+
 $$
 X = 
 \begin{bmatrix}
-    x_{11} & x_{12} & ... & x_{1D}\\
-    x_{21} & x_{22} & ... & x_{2D}\\
-    ... & ... & ... & ... \\
-    x_{N1} & x_{N2} & ... & x_{ND}
+x_{11} & x_{12} & \cdots & x_{1D}\\
+x_{21} & x_{22} & \cdots & x_{2D}\\
+\vdots & \vdots & \ddots & \vdots\\
+x_{N1} & x_{N2} & \cdots & x_{ND}
 \end{bmatrix}
 $$
 
 $$
 W = 
 \begin{bmatrix}
-    w_{11} & w_{12} & ... & w_{1M}\\
-    w_{21} & w_{22} & ... & w_{2M} \\
-    ... & ... & ... & ... \\
-    w_{D1} & w_{D2} & ... & w_{DM}
-\end{bmatrix} 
+w_{11} & w_{12} & \cdots & w_{1M}\\
+w_{21} & w_{22} & \cdots & w_{2M}\\
+\vdots & \vdots & \ddots & \vdots\\
+w_{D1} & w_{D2} & \cdots & w_{DM}
+\end{bmatrix}
 $$
+
 $$
 b =
 \begin{bmatrix}
-    b_{11} & b_{12} & ... & b_{1M}\\
-    b_{21} & b_{22} & ... & b_{2M}\\
-    ... & ... & ... & ... \\
-    b_{N1} & b_{N2} & ... & b_{NM} 
+b_1 & b_2 & \cdots & b_M
 \end{bmatrix}
 $$
 
-The __Affine Tranformation__ of X is:
+The **Affine Transformation** of X is:
+
 $$
-A = 
-XW+b
+A = XW + b
 $$
+
 in which:
+
 $$
-A_{ij} = \sum_{k=1}^{D} x_{ik} w_{kj} + b_{ij}
+A_{ij} = \sum_{k=1}^{D} X_{ik} W_{kj} + b_j
 $$
-and after the __Activation Layer__ (e.g.: Relu, Sigmoid, Softmax...):
+
+After the **Activation Layer** (e.g.: ReLU, Sigmoid, Softmax):
+
 $$
 Y = f(A)
 $$
-and __Objective (Loss) Layer__ (e.g.: Cross Entropy Error, Least Square Error...):
+
+and **Objective (Loss) Layer** (e.g.: Cross Entropy, Least Square):
+
 $$
 L = Loss(Y)
 $$
-We get the objective __"Loss"__ we wish to minimize.
 
-### Goal of Back Propagation:
+We get the objective "Loss" we wish to minimize.
 
-Now I'm going to show the workflow of __Back Propagation__:
+### Goal of Back Propagation
 
-We want to change parameters in __W__ and __b__, which will be implemented by __gradient descent__ learned in last chapter:
+We want to update parameters W and b using gradient descent:
+
 $$
-W_{new} = W - \eta \frac{\partial L}{\partial W} \\
-\\[10pt]
-b_{new} = W - \eta \frac{\partial L}{\partial b}
+W_{new} = W - \eta \frac{\partial L}{\partial W}\\[10pt]
+b_{new} = b - \eta \frac{\partial L}{\partial b}
 $$
 
-Imagine that we acquire the gradient matrix using __middle differentiation method__ we learned in last chapter:
+Assume we have obtained the upstream gradient from the Loss layer:
+
 $$
 \frac{\partial L}{\partial Y} =
 \begin{bmatrix}
-    g_{11} & g_{12} & ... & g_{1M} \\
-    g_{21} & g_{22} & ... & g_{2M} \\
-    ... & ... & ... & ... \\
-    g_{N1} & g_{N2} & ... & g_{NM} 
+g_{11} & g_{12} & \cdots & g_{1M}\\
+g_{21} & g_{22} & \cdots & g_{2M}\\
+\vdots & \vdots & \ddots & \vdots\\
+g_{N1} & g_{N2} & \cdots & g_{NM}
 \end{bmatrix}
 $$
-Using __Chain Rule__, we get a path to compute the two gradient matrixs we need:
+
+Using the Chain Rule, we can compute the gradients w.r.t W and b:
+
 $$
-\frac{\partial L}{\partial W} = \frac{\partial L}{\partial Y} \frac{\partial Y}{\partial A} \frac{\partial A}{\partial W}
-\\[10pt]
+\frac{\partial L}{\partial W} = \frac{\partial L}{\partial Y} \frac{\partial Y}{\partial A} \frac{\partial A}{\partial W}\\[10pt]
 \frac{\partial L}{\partial b} = \frac{\partial L}{\partial Y} \frac{\partial Y}{\partial A} \frac{\partial A}{\partial b}
 $$
-in which
+
+where
 $$
 \frac{\partial Y}{\partial A}
 $$
-is __Activation Layer__;
+is the **Activation Layer**;
 $$
 \frac{\partial A}{\partial W}
 $$
-is __Multiplcation Layer__;
+is the **Multiplication Layer**;
 $$
 \frac{\partial A}{\partial b}
 $$
-is __Addition Layer__. 
+is the **Addition Layer**.
 
-### Back Propagation of Activation Layer:
+### Back Propagation of Activation Layer
+
 For A ∈ R(N×M), we have:
+
 $$
 Y_{ij} = f(A_{ij})
 $$
-which means that each element of output Y is only dependent on the element of input A in the corresponding position. 
+
+which means that each element of output Y depends only on the corresponding element of input A.
 
 Since we know the gradient of Loss to Y for each element:
+
 $$
 dY_{ij} = \frac{\partial L}{\partial Y_{ij}}
 $$
-and we want
+
+and we want:
+
 $$
 dA_{ij} = \frac{\partial L}{\partial A_{ij}}
 $$
-, so we use __Chain Rule__:
+
+Using Chain Rule:
+
 $$
 \frac{\partial L}{\partial A_{ij}} = \sum_{p=1}^{N} \sum_{q=1}^{M} \frac{\partial L}{\partial Y_{pq}} \frac{\partial Y_{pq}}{\partial A_{ij}}
 $$
-As we know, Y(pq) is only dependent on A(pq), so only when
+
+Since Y_{pq} depends only on A_{pq}, we have:
+
 $$
-p = i, q = j
+\frac{\partial Y_{pq}}{\partial A_{ij}} = 0, \quad (p,q) \ne (i,j)
 $$
-, Y(pq) is dependent on A(ij), which means that
-$$
-\frac{\partial Y_{pq}}{\partial A_{ij}} = 0
-\\[10pt]k
-(p≠i, q≠j)
-$$
-. And, when (p,q) = (i, j):
+
+and when (p,q) = (i,j):
+
 $$
 \frac{\partial Y_{ij}}{\partial A_{ij}} = f'(A_{ij})
 $$
-. In this way, we get:
+
+Thus:
+
 $$
-\frac{\partial L}{\partial A_{ij}} = \frac{\partial L}{\partial Y_{ij}} * f'(A_{ij})
+\frac{\partial L}{\partial A_{ij}} = \frac{\partial L}{\partial Y_{ij}} f'(A_{ij})
 $$
-which is:
-$$
-dA_{ij} = dY_{ij}f'(A_{ij})
-$$
-. Written in matrix form, this is:
+
+In matrix form:
+
 $$
 dA = dY \odot f'(A)
 $$
-This form is really good! __"odot"__ is __Element-Wise Multiplication__, which is the default multiplication in numpy!
 
-### Back Propagation of Multiplication Layer:
-__Part I:__
+**Note:** \(\odot\) denotes element-wise multiplication (like NumPy `*` operator).
 
-Imagine that we have:
+### Back Propagation of Multiplication Layer
+
+Assume:
+
 $$
-A = XW
-\\[10pt]
-X∈R^{N×D}, W∈R^{D×M}
-\\[10pt]
-A∈R^{N×M}
+A = X W\\[10pt]
+X \in R^{N\times D}, W \in R^{D\times M}\\[10pt]
+A \in R^{N\times M}
 $$
-in which:
+
+Each element:
+
 $$
 A_{ij} = \sum_{k=1}^{D} X_{ik} W_{kj}
 $$
-. Now in __back propagation__, we have already had:
-$$
-dA = \frac{\partial L}{\partial A}
-\\[10pt]
-dA_{ij} = \frac{\partial L}{\partial A_{ij}}
-$$
-, and our goal is to calculate:
-$$
-dW = \frac{\partial L}{\partial W}
-\\[10pt]
-dX = \frac{\partial L}{\partial X}
-$$
-Let's first concentrate on dW. This means that we should calculate every element:
-$$
-\frac{\partial L}{\partial W_{pq}}
-$$
-Using __Chain Rule__, this is:
-$$
-\frac{\partial L}{\partial W_{pq}} = \sum_{i=1}^{N} \sum_{j=1}^{M} \frac{\partial L}{\partial A_{ij}} \frac{\partial A_{ij}}{\partial W_{pq}}
-$$
-As we know, 
-$$
-A_{ij} = \sum_{k=1}^{D} X_{ik} W_{kj}
-$$
-, so only when:
-$$
-k=p, j=q
-$$
-Wpq will appear. 
 
-The corresponding multiplication becomes:
+Given upstream gradient:
+
 $$
-X_{ip}W_{pq}
+dA = \frac{\partial L}{\partial A}, \quad dA_{ij} = \frac{\partial L}{\partial A_{ij}}
 $$
 
-This means that:
+#### Gradient w.r.t W
+
+For each W_{pq}:
+
 $$
-\frac{\partial A_{ij}}{\partial W_{pq}}=
+\frac{\partial L}{\partial W_{pq}} = \sum_{i=1}^{N} \sum_{j=1}^{M} dA_{ij} \frac{\partial A_{ij}}{\partial W_{pq}}
+$$
+
+Since A_{ij} depends on W_{pq} only when k=p, j=q:
+
+$$
+\frac{\partial A_{ij}}{\partial W_{pq}} = 
 \begin{cases}
 X_{ip}, & j=q \\
-0, & j≠q
+0, & j\ne q
 \end{cases}
 $$
-therefore, according to multiplication rule of constants:
+
+Thus:
+
 $$
-\frac{\partial L}{\partial W_{pq}} = \sum_{i=1}^{N} dA_{iq}X_{ip} = \sum_{i=1}^{N} X_{ip}dA_{iq}
+\frac{\partial L}{\partial W_{pq}} = \sum_{i=1}^{N} X_{ip} dA_{iq}
 $$
-Notice that:
-$$
-\sum_{i=1}^{N} X_{ip}dA_{iq} = \sum_{i=1}^{N} X_{pi}^TdA_{iq} = (X^TdA)_{pq}
-$$
-we eventually get:
+
+In matrix form:
+
 $$
 dW = X^T dA
 $$
-so
+
+#### Gradient w.r.t X
+
+Similarly:
+
 $$
-dW = X^T (dY \odot f'(A))
+\frac{\partial L}{\partial X_{pq}} = \sum_{i=1}^{N} \sum_{j=1}^{M} dA_{ij} \frac{\partial A_{ij}}{\partial X_{pq}}
 $$
 
-__Part II:__
+Where:
 
-We want:
 $$
-\frac{\partial L}{\partial X_{pq}}
-$$
-so:
-$$
-\frac{\partial L}{\partial X_{pq}} = \sum_{i=1}^{N} \sum_{j=1}^{M} \frac{\partial L}{\partial A_{ij}} \frac{\partial A_{ij}}{\partial X_{pq}}
-$$
-Since:
-$$
-A_{ij} = \sum_{k=1}^{D} X_{ik}W_{kj}
-$$
-only when:
-$$
-i=p, k=q
-$$
-will they mutually influenced, so the corresponding multiplication becomes:
-$$
-X_{pq}W_{qj}
-$$
-so:
-$$
-\frac{\partial A_{ij}}{\partial X_{pq}}=
+\frac{\partial A_{ij}}{\partial X_{pq}} = 
 \begin{cases}
 W_{qj}, & i=p \\
-0, & i≠p
+0, & i\ne p
 \end{cases}
 $$
-Take it back to original equation:
+
+Hence:
+
 $$
-\frac{\partial L}{\partial X_{pq}} = \sum_{j=1}^{M} dA_{pj}W_{qj}
+\frac{\partial L}{\partial X_{pq}} = \sum_{j=1}^{M} dA_{pj} W_{qj}
 $$
 
-Notice that:
+Matrix form:
+
 $$
-\sum_{j=1}^{M} dA_{pj}W_{qj} = \sum_{j=1}^{M} dA_{pj}W_{jq}^T = (dAW^T)_{pq}
-$$
-so:
-$$
-dX=dAW^T
-$$
-which could be extended as:
-$$
-dX = (dY \odot f'(A))W^T
+dX = dA W^T
 $$
 
-__Part III: Conclusion__
+Combined with activation layer:
+
 $$
-dW = X^T(dY \odot f'(A))
-\\[10pt]
-dX = (dY \odot f'(A))W^T
+dX = (dY \odot f'(A)) W^T
 $$
 
-### Back Propagation of Addition Layer:
-We have:
-$$
-A = XW + b
-\\[10pt]
-X∈R^{N×D}, W∈R^{D×M}
-\\[10pt]
-b∈R^{1×M}
-\\[10pt]
-A∈R^{N×M}
-$$
-(Why b ∈ R(1×M)? This is because in order to __prevent over-fitting__, for every column, we have the same offset bj for every element in every row.)
+### Back Propagation of Addition Layer
 
-According to __Chain Rule__:
+Assume:
+
 $$
-\frac{\partial L}{\partial b_j} = \sum_{i=1}^{N}\frac{\partial L}{\partial A_{ij}} = \sum_{i=1}^{N}dA_{ij}
+A = XW + b\\[10pt]
+X \in R^{N\times D}, W \in R^{D\times M}\\[10pt]
+b \in R^{1\times M}\\[10pt]
+A \in R^{N\times M}
 $$
+
+The gradient w.r.t bias:
+
+$$
+\frac{\partial L}{\partial b_j} = \sum_{i=1}^{N} dA_{ij}
+$$
+
+This gives a 1×M vector, broadcasting over the batch in forward propagation.

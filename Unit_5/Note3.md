@@ -93,23 +93,17 @@ $$
 Using the Chain Rule, we can compute the gradients w.r.t W and b:
 
 $$
-\frac{\partial L}{\partial W} = \frac{\partial L}{\partial Y} \frac{\partial Y}{\partial A} \frac{\partial A}{\partial W}\\[10pt]
+\frac{\partial L}{\partial W} = \frac{\partial L}{\partial Y} \frac{\partial Y}{\partial A} \frac{\partial A}{\partial W}
+$$
+$$
 \frac{\partial L}{\partial b} = \frac{\partial L}{\partial Y} \frac{\partial Y}{\partial A} \frac{\partial A}{\partial b}
 $$
 
-where
-$$
-\frac{\partial Y}{\partial A}
-$$
-is the **Activation Layer**;
-$$
-\frac{\partial A}{\partial W}
-$$
-is the **Multiplication Layer**;
-$$
-\frac{\partial A}{\partial b}
-$$
-is the **Addition Layer**.
+where:
+
+- $\frac{\partial Y}{\partial A}$ corresponds to the Activation Layer.
+- $\frac{\partial A}{\partial W}$ corresponds to the Multiplication Layer.
+- $\frac{\partial A}{\partial b}$ corresponds to the Addition Layer.
 
 ### Back Propagation of Activation Layer
 
@@ -264,7 +258,9 @@ $$
 Assume:
 
 $$
-A = XW + b\\[10pt]
+A = XW + b
+$$
+$$
 X \in R^{N\times D}, W \in R^{D\times M}
 $$
 
